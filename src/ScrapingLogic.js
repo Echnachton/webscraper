@@ -1,5 +1,4 @@
-const puppeteer = require("puppeteer-extra"),
-path = require("path"),
+const path = require("path"),
 fs = require("fs"),
 axios = require("axios"),
 cookie = {
@@ -10,26 +9,12 @@ cookie = {
     path:"/",
     httpOnly:false,
     secure:true
-},
-AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-puppeteer.use(AdblockerPlugin());
+};
 
-const browserhndlr = {
-    activeBrowser: null,
-    getBrowser: async function(headless) {
-        let hasLaunched = false;
-        if(hasLaunched == false){
-            const browser = await puppeteer.launch({headless:headless});
-            this.activeBrowser = browser;
-            this.hasLaunched = true;
-        }
-        return this.activeBrowser;
-    },
-    instantiatePage: async function(browser) {
-        const page = await browser.newPage();
-        await page.setCookie(cookie);
-        return page;
-    }
+async function spawnPage(browser){
+    const page = await browser.newPage();
+    await page.setCookie(cookie);
+    return page;
 }
 
 const fileSystemHndlr = {
@@ -50,9 +35,9 @@ const fileSystemHndlr = {
 
 //todo error handle by returning status codes. page.on(requestfailed, response)
 const yTChannelScraper = {
-    getAllVideos: async (initUrl, scrls, outDir)=>{
-        const browser = await browserhndlr.getBrowser(false);
-        const page = await browserhndlr.instantiatePage(browser);
+    getAllVideos: async (initUrl, scrls, outDir, browser)=>{
+
+        const page = await spawnPage(browser);
         
         try{
             await page.goto(initUrl);
@@ -73,10 +58,9 @@ const yTChannelScraper = {
 }
 
 const captionScraper = {
-    gotoEachVid: async (inDir,outDir) => {
+    gotoEachVid: async (inDir,outDir, browser) => {
 
-        const browser = await browserhndlr.getBrowser(true);
-        const page = await browserhndlr.instantiatePage(browser);
+        const page = await spawnPage(browser);
 
         const urls = [];
 
