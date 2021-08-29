@@ -2,13 +2,11 @@ const parser = require("./ScrapingLogic");
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
-// const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-// puppeteer.use(AdblockerPlugin());
 
 (async _=>{
     process.stdout.write("Welcome to LineSweeper \n");
     const config = getConfig();
-    const browser = await initBrowser(false);
+    const browser = await initBrowser(true);
     for(let i = 0; i <= config.urlArray.length-1; i++){
         await scraperCaller(config, i, browser);
         console.log(`${i+1}/${config.urlArray.length}`);
@@ -16,7 +14,7 @@ const puppeteer = require("puppeteer");
 })();
 
 function getConfig(){
-    const configFileName = "../config/gaming_config.json";
+    const configFileName = "../config/travel_config.json";
     let config = fs.readFileSync(configFileName, "utf8",(err, data)=>{
         return data;
     });
@@ -43,6 +41,8 @@ async function scraperCaller(config, iteration, browser){
             await parser.captionScraper.gotoEachVid(`${uniqueDirName}/videoUrls.json`, `${uniqueDirName}/captionUrls.json`, browser);
             break;
         case 2:
+            browser.close();
+            console.log("converting...");
             await parser.caption2TxtConverter.mainLoop(`${uniqueDirName}/captionUrls.json`, `${uniqueDirName}/captions.json`);
             break;
         case 3:
