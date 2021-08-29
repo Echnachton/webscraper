@@ -1,0 +1,1 @@
+Download, Unzip, and put uBlock0.chromium from https://github.com/gorhill/uBlock/releases
